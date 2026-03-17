@@ -3,7 +3,7 @@ namespace Practica_2
     public class Nodo
     {
         public Paciente Dato { get; set; }
-        public Nodo? Siguiente { get; set; }
+        public Nodo? Siguiente { get; set; } 
 
         public Nodo(Paciente paciente)
         {
@@ -27,7 +27,7 @@ namespace Practica_2
             }
             else
             {
-                fin!.Siguiente = nuevoNodo;
+                if (fin != null) fin.Siguiente = nuevoNodo;
                 fin = nuevoNodo;
             }
         }

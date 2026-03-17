@@ -1,0 +1,15 @@
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\bin\Debug\net10.0-windows\Practica 2.exe
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\Practica 2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\Practica 2.AssemblyInfoInputs.cache
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\Practica 2.AssemblyInfo.cs
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\Practica 2.csproj.CoreCompileInputs.cache
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\Practica 2.sourcelink.json
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\Practica 2.dll
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\refint\Practica 2.dll
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\Practica 2.pdb
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\bin\Debug\net10.0-windows\Practica 2.deps.json
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\bin\Debug\net10.0-windows\Practica 2.runtimeconfig.json
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\bin\Debug\net10.0-windows\Practica 2.dll
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\bin\Debug\net10.0-windows\Practica 2.pdb
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\Practica 2.genruntimeconfig.cache
+C:\Users\aleja\Documents\Practica 2 IPC\Practica 2\obj\Debug\net10.0-windows\ref\Practica 2.dll

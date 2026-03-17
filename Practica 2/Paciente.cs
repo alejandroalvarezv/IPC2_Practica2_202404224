@@ -2,9 +2,9 @@ namespace Practica_2
 {
     public class Paciente
     {
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty; 
         public int Edad { get; set; }
-        public string Especialidad { get; set; }
+        public string Especialidad { get; set; } = string.Empty;
         public int TiempoAtencion { get; set; }
 
         public Paciente(string nombre, int edad, string especialidad)
@@ -13,7 +13,6 @@ namespace Practica_2
             Edad = edad;
             Especialidad = especialidad;
 
-            // Tiempos de atención según el enunciado
             if (especialidad == "Medicina General") TiempoAtencion = 10;
             else if (especialidad == "Pediatría") TiempoAtencion = 15;
             else if (especialidad == "Ginecología") TiempoAtencion = 20;
