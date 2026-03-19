@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.IO; 
 
 namespace Practica_2
 {
@@ -18,7 +19,7 @@ namespace Practica_2
         public Form1()
         {
             this.Text = "Sistema de Turnos Médicos - Clínica";
-            this.Size = new Size(450, 500);
+            this.Size = new Size(450, 550); // Aumenté un poco el alto
             this.StartPosition = FormStartPosition.CenterScreen;
 
             InicializarComponentesManual();
@@ -76,6 +77,8 @@ namespace Practica_2
 
             lblResultado.Text = $"REGISTRADO:\nPaciente: {nombre}\nAtención: {nuevo.TiempoAtencion} min\nEspera Total: {tiempoTotalEstimado} min";
             txtNombre.Clear();
+
+            GenerarGrafica(); 
         }
 
         private void BtnAtender_Click(object? sender, EventArgs e)
@@ -86,6 +89,7 @@ namespace Practica_2
             {
                 MessageBox.Show($"Atendiendo a: {atendido.Nombre}\nEspecialidad: {atendido.Especialidad}");
                 lblResultado.Text = "Paciente atendido con éxito.";
+                GenerarGrafica(); 
             }
             else
             {
@@ -102,6 +106,58 @@ namespace Practica_2
                 nodo = nodo.Siguiente;
             }
             return suma;
+        }
+
+        private void GenerarGrafica()
+        {
+            string dot = "digraph G {\n";
+            dot += "  rankdir=LR;\n"; 
+            dot += "  node [shape=record, style=filled, fillcolor=lightblue];\n";
+
+            Nodo? actual = colaClinica.ObtenerInicio();
+            int i = 0;
+
+            if (actual == null)
+            {
+                dot += "  n_vacia [label=\"COLA VACÍA\"];\n";
+            }
+            else
+            {
+                while (actual != null)
+                {
+                    dot += $"  nodo{i} [label=\"{{ Nombre: {actual.Dato.Nombre} | {actual.Dato.Especialidad} | {actual.Dato.TiempoAtencion} min }}\"];\n";
+                    if (actual.Siguiente != null)
+                    {
+                        dot += $"  nodo{i} -> nodo{i + 1};\n";
+                    }
+                    actual = actual.Siguiente;
+                    i++;
+                }
+            }
+
+            dot += "}";
+
+            try 
+            {
+                File.WriteAllText("cola.dot", dot);
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "dot",
+                    Arguments = "-Tpng cola.dot -o cola.png",
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                System.Diagnostics.Process.Start(startInfo)?.WaitForExit();
+                
+                if (File.Exists("cola.png"))
+                {
+                    Console.WriteLine("Gráfica generada en la carpeta del proyecto.");
+                }
+            } 
+            catch (Exception ex) 
+            {
+                MessageBox.Show("Instala Graphviz y agrégalo al PATH para ver la gráfica: " + ex.Message);
+            }
         }
     }
 }
