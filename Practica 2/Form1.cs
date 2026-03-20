@@ -9,17 +9,22 @@ namespace Practica_2
     {
         private GestionCola colaClinica = new GestionCola();
         
+        private int tiempoAtencionAcumulado = 0;
+
         private TextBox txtNombre = null!;
         private NumericUpDown txtEdad = null!;
         private ComboBox cmbEspecialidad = null!;
         private Button btnRegistrar = null!;
         private Button btnAtender = null!;
+        private Button btnVisualizar = null!;
+        private ListBox lstColaTexto = null!;
         private Label lblResultado = null!;
+        private Button btnSalir = null!;
 
         public Form1()
         {
             this.Text = "Sistema de Turnos Médicos - Clínica";
-            this.Size = new Size(450, 550); // Aumenté un poco el alto
+            this.Size = new Size(460, 620); 
             this.StartPosition = FormStartPosition.CenterScreen;
 
             InicializarComponentesManual();
@@ -27,6 +32,7 @@ namespace Practica_2
 
         private void InicializarComponentesManual()
         {
+            // --- Registro de Pacientes ---
             Label lblNombre = new Label { Text = "Nombre del Paciente:", Location = new Point(20, 20), Width = 150 };
             txtNombre = new TextBox { Location = new Point(20, 45), Width = 200 };
 
@@ -37,13 +43,25 @@ namespace Practica_2
             cmbEspecialidad = new ComboBox { Location = new Point(20, 165), Width = 200, DropDownStyle = ComboBoxStyle.DropDownList };
             cmbEspecialidad.Items.AddRange(new string[] { "Medicina General", "Pediatría", "Ginecología", "Dermatología" });
 
-            btnRegistrar = new Button { Text = "Registrar Turno", Location = new Point(20, 210), Width = 200, Height = 40 };
+            // --- Botones de Acción ---
+            btnRegistrar = new Button { Text = "Registrar Turno", Location = new Point(20, 210), Width = 190, Height = 40, BackColor = Color.LightGreen };
             btnRegistrar.Click += BtnRegistrar_Click;
 
-            btnAtender = new Button { Text = "Atender Siguiente", Location = new Point(230, 210), Width = 180, Height = 40 };
+            btnAtender = new Button { Text = "Atender Siguiente", Location = new Point(220, 210), Width = 190, Height = 40, BackColor = Color.LightSkyBlue };
             btnAtender.Click += BtnAtender_Click;
 
-            lblResultado = new Label { Text = "Esperando registros...", Location = new Point(20, 270), Width = 400, Height = 100, ForeColor = Color.Blue };
+            btnVisualizar = new Button { Text = "Visualizar Cola", Location = new Point(20, 260), Width = 390, Height = 40, BackColor = Color.LightGoldenrodYellow };
+            btnVisualizar.Click += BtnVisualizar_Click;
+
+            // --- Visualización de Datos (Rúbrica: Ver Cola) ---
+            Label lblLista = new Label { Text = "Cola de Turnos (Detalle):", Location = new Point(20, 310), Width = 200 };
+            lstColaTexto = new ListBox { Location = new Point(20, 335), Width = 390, Height = 120, Font = new Font("Consolas", 9) };
+
+            lblResultado = new Label { Text = "Esperando registros...", Location = new Point(20, 470), Width = 400, Height = 40, ForeColor = Color.Blue };
+
+            // --- Botón Salir ---
+            btnSalir = new Button { Text = "Salir", Location = new Point(165, 520), Width = 100, Height = 35, BackColor = Color.LightCoral };
+            btnSalir.Click += (s, e) => Application.Exit();
 
             this.Controls.Add(lblNombre);
             this.Controls.Add(txtNombre);
@@ -53,7 +71,11 @@ namespace Practica_2
             this.Controls.Add(cmbEspecialidad);
             this.Controls.Add(btnRegistrar);
             this.Controls.Add(btnAtender);
+            this.Controls.Add(btnVisualizar);
+            this.Controls.Add(lblLista);
+            this.Controls.Add(lstColaTexto);
             this.Controls.Add(lblResultado);
+            this.Controls.Add(btnSalir);
         }
 
         private void BtnRegistrar_Click(object? sender, EventArgs e)
@@ -64,19 +86,16 @@ namespace Practica_2
                 return;
             }
 
-            string nombre = txtNombre.Text;
-            int edad = (int)txtEdad.Value;
-            string especialidad = cmbEspecialidad.SelectedItem.ToString() ?? "";
-
-            Paciente nuevo = new Paciente(nombre, edad, especialidad);
+            Paciente nuevo = new Paciente(txtNombre.Text, (int)txtEdad.Value, cmbEspecialidad.SelectedItem.ToString()!);
             
-            int tiempoEsperaPrevio = SumarTiemposEnCola(colaClinica.ObtenerInicio());
-            int tiempoTotalEstimado = tiempoEsperaPrevio + nuevo.TiempoAtencion;
+            int tiempoEsperaEnFila = SumarTiemposEnCola(colaClinica.ObtenerInicio());
+            int tiempoTotalEstimado = tiempoEsperaEnFila + nuevo.TiempoAtencion;
 
             colaClinica.Encolar(nuevo);
 
-            lblResultado.Text = $"REGISTRADO:\nPaciente: {nombre}\nAtención: {nuevo.TiempoAtencion} min\nEspera Total: {tiempoTotalEstimado} min";
+            lblResultado.Text = $"REGISTRADO: {nuevo.Nombre}\nEspera en fila al llegar: {tiempoEsperaEnFila} min";
             txtNombre.Clear();
+            txtEdad.Value = 0;
 
             GenerarGrafica(); 
         }
@@ -87,13 +106,62 @@ namespace Practica_2
 
             if (atendido != null)
             {
-                MessageBox.Show($"Atendiendo a: {atendido.Nombre}\nEspecialidad: {atendido.Especialidad}");
-                lblResultado.Text = "Paciente atendido con éxito.";
+                int tAtencion = atendido.TiempoAtencion;
+                int tEnCola = tiempoAtencionAcumulado; 
+                int tTotal = tAtencion + tEnCola;
+
+                string mensaje = $"ATENDIENDO A:\n" +
+                                 $"Nombre: {atendido.Nombre}\n" +
+                                 $"Especialidad: {atendido.Especialidad}\n" +
+                                 $"---------------------------\n" +
+                                 $"1. Tiempo Atención: {tAtencion} min\n" +
+                                 $"2. Tiempo en Cola: {tEnCola} min\n" +
+                                 $"3. Tiempo Total: {tTotal} min";
+
+                MessageBox.Show(mensaje, "Atención Realizada");
+
+                tiempoAtencionAcumulado += tAtencion;
+
+                lblResultado.Text = $"Atendido: {atendido.Nombre}.";
+                
+                if (colaClinica.ObtenerInicio() == null)
+                {
+                    tiempoAtencionAcumulado = 0;
+                }
+
+                lstColaTexto.Items.Clear(); 
                 GenerarGrafica(); 
             }
             else
             {
                 MessageBox.Show("No hay turnos pendientes.");
+                tiempoAtencionAcumulado = 0;
+            }
+        }
+
+        private void BtnVisualizar_Click(object? sender, EventArgs e)
+        {
+            lstColaTexto.Items.Clear();
+            Nodo? actual = colaClinica.ObtenerInicio();
+            
+            int esperaDesdeAhora = 0; 
+
+            if (actual == null)
+            {
+                MessageBox.Show("La cola está vacía.");
+                return;
+            }
+
+            while (actual != null)
+            {
+                int tAtencion = actual.Dato.TiempoAtencion;
+                int tTotal = esperaDesdeAhora + tAtencion;
+
+                string info = $"{actual.Dato.Nombre} | Atenc: {tAtencion}m | Espera: {esperaDesdeAhora}m | Total: {tTotal}m";
+                lstColaTexto.Items.Add(info);
+
+                esperaDesdeAhora += tAtencion;
+                actual = actual.Siguiente;
             }
         }
 
@@ -125,7 +193,7 @@ namespace Practica_2
             {
                 while (actual != null)
                 {
-                    dot += $"  nodo{i} [label=\"{{ Nombre: {actual.Dato.Nombre} | {actual.Dato.Especialidad} | {actual.Dato.TiempoAtencion} min }}\"];\n";
+                    dot += $"  nodo{i} [label=\"{{ {actual.Dato.Nombre} | {actual.Dato.Especialidad} | {actual.Dato.TiempoAtencion} min }}\"];\n";
                     if (actual.Siguiente != null)
                     {
                         dot += $"  nodo{i} -> nodo{i + 1};\n";
@@ -134,7 +202,6 @@ namespace Practica_2
                     i++;
                 }
             }
-
             dot += "}";
 
             try 
@@ -148,16 +215,8 @@ namespace Practica_2
                     CreateNoWindow = true
                 };
                 System.Diagnostics.Process.Start(startInfo)?.WaitForExit();
-                
-                if (File.Exists("cola.png"))
-                {
-                    Console.WriteLine("Gráfica generada en la carpeta del proyecto.");
-                }
             } 
-            catch (Exception ex) 
-            {
-                MessageBox.Show("Instala Graphviz y agrégalo al PATH para ver la gráfica: " + ex.Message);
-            }
+            catch { }
         }
     }
 }
